@@ -1,0 +1,12 @@
+PRAGMA foreign_keys=ON;
+CREATE TABLE dim_tiempo(tiempo_sk INTEGER PRIMARY KEY,fecha TEXT UNIQUE NOT NULL,anio INTEGER NOT NULL,mes INTEGER NOT NULL,trimestre INTEGER NOT NULL,anio_mes TEXT NOT NULL);
+CREATE TABLE dim_producto(producto_sk INTEGER PRIMARY KEY,nombre TEXT NOT NULL,categoria TEXT NOT NULL,precio_lista INTEGER NOT NULL,costo_unitario INTEGER NOT NULL);
+CREATE TABLE dim_cliente(cliente_sk INTEGER PRIMARY KEY,cliente_nk INTEGER NOT NULL,nombre TEXT NOT NULL,segmento TEXT NOT NULL,vigente_desde TEXT NOT NULL,vigente_hasta TEXT NOT NULL,CHECK(vigente_desde<=vigente_hasta),UNIQUE(cliente_nk,vigente_desde));
+CREATE TABLE dim_sucursal(sucursal_sk INTEGER PRIMARY KEY,nombre TEXT UNIQUE NOT NULL);
+CREATE TABLE dim_canal(canal_sk INTEGER PRIMARY KEY,nombre TEXT UNIQUE NOT NULL);
+CREATE TABLE dim_promocion(promocion_sk INTEGER PRIMARY KEY,nombre TEXT UNIQUE NOT NULL);
+CREATE TABLE fact_ventas(ticket_id INTEGER NOT NULL,linea_nro INTEGER NOT NULL,tiempo_sk INTEGER NOT NULL REFERENCES dim_tiempo,producto_sk INTEGER NOT NULL REFERENCES dim_producto,cliente_sk INTEGER NOT NULL REFERENCES dim_cliente,sucursal_sk INTEGER NOT NULL REFERENCES dim_sucursal,canal_sk INTEGER NOT NULL REFERENCES dim_canal,promocion_sk INTEGER NOT NULL REFERENCES dim_promocion,cantidad INTEGER NOT NULL CHECK(cantidad>0),ingreso_bruto_cent INTEGER NOT NULL CHECK(ingreso_bruto_cent>=0),descuento_cent INTEGER NOT NULL CHECK(descuento_cent>=0),devolucion_cent INTEGER NOT NULL CHECK(devolucion_cent>=0),ingreso_neto_cent INTEGER NOT NULL,costo_cent INTEGER NOT NULL CHECK(costo_cent>=0),margen_bruto_cent INTEGER NOT NULL,CHECK(ingreso_neto_cent=ingreso_bruto_cent-descuento_cent-devolucion_cent),CHECK(margen_bruto_cent=ingreso_neto_cent-costo_cent),PRIMARY KEY(ticket_id,linea_nro));
+CREATE TABLE conciliacion_fuente(lineas INTEGER,bruto_cent INTEGER,descuento_cent INTEGER,devolucion_cent INTEGER,costo_cent INTEGER,neto_cent INTEGER);
+CREATE INDEX idx_ventas_tiempo ON fact_ventas(tiempo_sk);
+CREATE INDEX idx_ventas_cliente ON fact_ventas(cliente_sk);
+CREATE INDEX idx_ventas_producto ON fact_ventas(producto_sk);

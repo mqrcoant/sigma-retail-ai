@@ -1,0 +1,74 @@
+{
+  "id_sesion": "6f05d9b4-71f4-436e-9bfe-cc541e5fafc5",
+  "pregunta": "¿Cuál fue el ingreso neto por mes?",
+  "intencion": {
+    "codigo": "ingreso_mes",
+    "metrica": "Ingreso neto",
+    "dimension": "mes",
+    "filtros": {}
+  },
+  "consulta": {
+    "plantilla": "ingreso_mes",
+    "parametros": {},
+    "sql": "SELECT t.anio_mes etiqueta, ROUND(SUM(f.ingreso_neto_cent)/100.0,2) valor FROM fact_ventas f JOIN dim_tiempo t ON t.tiempo_sk=f.tiempo_sk JOIN dim_producto p ON p.producto_sk=f.producto_sk JOIN dim_cliente cl ON cl.cliente_sk=f.cliente_sk JOIN dim_sucursal s ON s.sucursal_sk=f.sucursal_sk JOIN dim_canal ca ON ca.canal_sk=f.canal_sk GROUP BY t.anio_mes ORDER BY t.anio_mes"
+  },
+  "resultado": [
+    {
+      "etiqueta": "2026-01",
+      "valor": 139561.45
+    },
+    {
+      "etiqueta": "2026-02",
+      "valor": 140578.5
+    },
+    {
+      "etiqueta": "2026-03",
+      "valor": 118416.45
+    },
+    {
+      "etiqueta": "2026-04",
+      "valor": 159000.85
+    },
+    {
+      "etiqueta": "2026-05",
+      "valor": 140456.25
+    },
+    {
+      "etiqueta": "2026-06",
+      "valor": 139902.9
+    },
+    {
+      "etiqueta": "2026-07",
+      "valor": 142497.4
+    },
+    {
+      "etiqueta": "2026-08",
+      "valor": 151288.9
+    },
+    {
+      "etiqueta": "2026-09",
+      "valor": 174257.05
+    },
+    {
+      "etiqueta": "2026-10",
+      "valor": 154714.2
+    },
+    {
+      "etiqueta": "2026-11",
+      "valor": 158236.85
+    },
+    {
+      "etiqueta": "2026-12",
+      "valor": 157209.35
+    }
+  ],
+  "respuesta": "Ingreso neto por mes. 2026-01: 139561.45; 2026-02: 140578.5; 2026-03: 118416.45; 2026-04: 159000.85; 2026-05: 140456.25; 2026-06: 139902.9; 2026-07: 142497.4; 2026-08: 151288.9; 2026-09: 174257.05; 2026-10: 154714.2; 2026-11: 158236.85; 2026-12: 157209.35. Regla: SUM(bruto-descuento-devolución). Fuente: Data Mart, plantilla ingreso_mes. Periodo: 2026 salvo filtros especificados.",
+  "fuente": [
+    "fact_ventas",
+    "dim_tiempo",
+    "dim_producto",
+    "dim_cliente",
+    "dim_sucursal",
+    "dim_canal"
+  ]
+}

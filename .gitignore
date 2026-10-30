@@ -1,13 +1,17 @@
+# Python
 __pycache__/
-.pytest_cache/
 *.py[cod]
+.pytest_cache/
 .venv/
 venv/
 .env
 .env.*
 !.env.example
+# Runtime object databases and logs
+data/*.fs
+data/*.fs.*
 *.log
-*.fs
-*.fs.*
-data/sesiones.fs*
+# Local tooling
 .DS_Store
+.idea/
+.vscode/

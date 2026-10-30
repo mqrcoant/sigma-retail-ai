@@ -1,0 +1,22 @@
+{
+  "lineas": 2031,
+  "tickets": 1020,
+  "ingreso_neto": 1776120.15,
+  "margen_bruto": 618706.15,
+  "casos": 20,
+  "aprobados": 20,
+  "controles": [
+    [
+      "Integridad referencial",
+      true
+    ],
+    [
+      "Conciliación ingreso",
+      true
+    ],
+    [
+      "Conciliación filas",
+      true
+    ]
+  ]
+}

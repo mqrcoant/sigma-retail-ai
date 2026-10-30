@@ -1,9 +1,5 @@
-streamlit
-pandas
-ZODB
-persistent
-transaction
-pytest
-openpyxl
-reportlab
-python-pptx
+streamlit>=1.35,<2
+ZODB>=6,<7
+persistent>=5,<7
+transaction>=4,<6
+pytest>=8,<10
