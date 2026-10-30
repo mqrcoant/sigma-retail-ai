@@ -1,0 +1,9 @@
+streamlit
+pandas
+ZODB
+persistent
+transaction
+pytest
+openpyxl
+reportlab
+python-pptx
