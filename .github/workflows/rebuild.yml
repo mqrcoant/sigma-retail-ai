@@ -1,11 +1,81 @@
-name: SIGMA reproduce and verify
+name: SIGMA Retail AI - Tests
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
 permissions:
-  contents: write
+  contents: read
 jobs:
-  info:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: echo 'SIGMA workflow placeholder; project source upload pending'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install reportlab python-pptx pypdf
+      - name: Run regression tests
+        run: python -m pytest -q
+      - name: Regenerate Data Mart and validation evidence
+        run: python build_deliverables.py
+      - name: Check all 20 scenarios and conciliations
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path('evidence/resumen_verificacion.json').read_text())
+          assert x['casos']==20 and x['aprobados']==20,x
+          assert all(ok for _,ok in x['controles']),x
+          assert x['lineas']==2031 and x['tickets']==1020,x
+          print('20/20 cases and reconciliations verified')
+          PY
+      - name: Verify ZODB persistence and recovery
+        run: |
+          python - <<'PY'
+          from tempfile import TemporaryDirectory
+          from pathlib import Path
+          from sigma.store import AlmacenObjetos
+          from sigma.agent import ejecutar
+          with TemporaryDirectory() as d:
+              path=Path(d)/'smoke.fs'
+              store=AlmacenObjetos(path)
+              s=store.obtener()
+              r=ejecutar('¿Cuál fue el ingreso neto por mes?',s)
+              assert r['estado']=='ok',r
+              store.guardar(s)
+              sid=s.id
+              store.cerrar()
+              store=AlmacenObjetos(path)
+              obj=store.obtener(sid)
+              assert obj.id==sid and len(obj.historial)==1
+              assert obj.historial[0]['pregunta'].texto
+              store.cerrar()
+          print('ZODB persistence round trip verified')
+          PY
+      - name: Rebuild and validate academic deliverables
+        run: |
+          python make_docs.py
+          python make_diagrams.py
+          python - <<'PY'
+          from zipfile import ZipFile
+          from pypdf import PdfReader
+          from pptx import Presentation
+          assert len(PdfReader('EquipoXX_Informe_Parcial01_vFinal.pdf').pages)>=5
+          assert len(Presentation('EquipoXX_Defensa.pptx').slides)==10
+          with ZipFile('EquipoXX_Pruebas.xlsx') as z:
+              assert z.testzip() is None
+          print('PDF, presentation and Excel are valid')
+          PY
+      - name: Smoke test Streamlit UI
+        run: |
+          python - <<'PY'
+          from streamlit.testing.v1 import AppTest
+          app=AppTest.from_file('app.py',default_timeout=30).run()
+          assert not app.exception,app.exception
+          print('Streamlit application loaded')
+          PY
