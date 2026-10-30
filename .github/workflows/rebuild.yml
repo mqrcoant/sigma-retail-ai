@@ -1,0 +1,11 @@
+name: SIGMA reproduce and verify
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  info:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: echo 'SIGMA workflow placeholder; project source upload pending'
